@@ -75,13 +75,17 @@ const bubblesArray = [];
 class Bubble {
     constructor(){
         this.x = Math.random() * canvas.width;
-        this.y = canvas.height + Math.random() * canvas.height;
+        this.y = canvas.height + 100;
         this.radius = 50;
         this.speed = Math.random() * 5 + 1;
         this.distance;
+        this.counted = false;
     }
     update(){
         this.y -= this.speed;
+        const dx = this.x - player.x;
+        const dy = this.y - player.y;
+        this.distance = Math.sqrt(dx*dx + dy*dy);
     }
     draw(){
         ctx.fillStyle = 'blue';
@@ -102,6 +106,20 @@ function handleBubbles(){
         bubble.update();
         bubble.draw();
     })
+    bubblesArray.forEach((bubble, i)=>{
+        if (bubble.y < 0 - bubble.radius * 2){
+            bubblesArray.splice(i, 1)
+        }
+        if (bubble.distance < bubble.radius + player.radius){
+            console.log('collision');
+            if(!bubble.counted){
+                score++;
+                bubble.counted = true;
+                bubblesArray.splice(i, 1)
+            }
+        }
+    })
+
 };
 
 
@@ -111,6 +129,8 @@ function animate() {
   handleBubbles();
   player.update();
   player.draw();
+  ctx.fillStyle = 'black';
+  ctx.fillText('score: ' + score, 15, 50);
   gameFrame++;
   requestAnimationFrame(animate);
 }
